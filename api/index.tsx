@@ -28,6 +28,7 @@ let pollingOptions = [
     voteCount: 0,
   },
 ];
+let votes: any = [];
 let fIDs: any = [];
 app.frame("/", (c) => {
   const { buttonValue, inputText, status, frameData } = c;
@@ -39,6 +40,7 @@ app.frame("/", (c) => {
         optionTag: "C",
         voteCount: 1,
       });
+      votes.push({ topic: inputText, fid: frameData?.fid });
     }
   } else if (buttonValue == "Submit" && !inputText) {
     return c.res({
@@ -51,7 +53,7 @@ app.frame("/", (c) => {
             justifyContent: "center",
             textAlign: "center",
             width: "100%",
-            backgroundColor: "red",
+            backgroundColor: "white",
             alignItems: "center",
             fontSize: "2.5rem",
           }}
@@ -74,19 +76,29 @@ app.frame("/", (c) => {
               justifyContent: "center",
               textAlign: "center",
               width: "100%",
-              backgroundColor: "red",
+              backgroundColor: "white",
               alignItems: "center",
               fontSize: "2.5rem",
             }}
           >
-            <h1>You have already voted</h1>
+            <h1>
+              You have already voted for{" "}
+              {votes.map((vote: any) => {
+                if (vote.fid === frameData?.fid) {
+                  return vote.topic;
+                }
+              })}
+            </h1>
           </div>
         ),
       });
     }
     fIDs.push(frameData?.fid);
+
     pollingOptions = pollingOptions.map((option) => {
       if (buttonValue === option.value) {
+        votes.push({ topic: option.value, fid: frameData?.fid });
+
         return { ...option, voteCount: option.voteCount + 1 };
       }
       return option;
@@ -95,10 +107,7 @@ app.frame("/", (c) => {
       image: (
         <div
           style={{
-            background:
-              status === "response"
-                ? "linear-gradient(to right, #432889, #17101F)"
-                : "black",
+            background: "white",
             display: "flex",
             alignItems: "center",
             flexDirection: "column",
@@ -145,7 +154,7 @@ app.frame("/", (c) => {
           justifyContent: "center",
           textAlign: "center",
           width: "100%",
-          backgroundColor: "red",
+          backgroundColor: "white",
           alignItems: "center",
           fontSize: "2.5rem",
         }}
