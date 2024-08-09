@@ -27,21 +27,61 @@ let pollingOptions = [
     optionTag: "B",
     voteCount: 0,
   },
-  {
-    value: "DeFi",
-    optionTag: "C",
-    voteCount: 0,
-  },
-  {
-    value: "Aptos",
-    optionTag: "D",
-    voteCount: 0,
-  },
 ];
+let fIDs: any = [];
 app.frame("/", (c) => {
-  const { buttonValue, inputText, status } = c;
-  const fruit = inputText || buttonValue;
+  const { buttonValue, inputText, status, frameData } = c;
+  if (buttonValue === "Submit" && inputText) {
+    pollingOptions.push({
+      value: inputText ?? "",
+      optionTag: "C",
+      voteCount: 0,
+    });
+  } else if (buttonValue == "Submit" && !inputText) {
+    return c.res({
+      image: (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            justifyContent: "center",
+            textAlign: "center",
+            width: "100%",
+            backgroundColor: "red",
+            alignItems: "center",
+            fontSize: "2.5rem",
+          }}
+        >
+          <h1>Empty topic</h1>
+        </div>
+      ),
+    });
+  }
+
   if (status === "response") {
+    if (fIDs.includes(frameData?.fid)) {
+      return c.res({
+        image: (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              height: "100%",
+              justifyContent: "center",
+              textAlign: "center",
+              width: "100%",
+              backgroundColor: "red",
+              alignItems: "center",
+              fontSize: "2.5rem",
+            }}
+          >
+            <h1>You have already voted</h1>
+          </div>
+        ),
+      });
+    }
+    fIDs.push(frameData?.fid);
     pollingOptions = pollingOptions.map((option) => {
       if (buttonValue === option.value) {
         return { ...option, voteCount: option.voteCount + 1 };
@@ -129,6 +169,7 @@ app.frame("/", (c) => {
       ...pollingOptions.map((option) => {
         return <Button value={option.value}>{option.optionTag}</Button>;
       }),
+      <Button value="Submit">Submit</Button>,
     ],
   });
 });
