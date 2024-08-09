@@ -32,11 +32,14 @@ let fIDs: any = [];
 app.frame("/", (c) => {
   const { buttonValue, inputText, status, frameData } = c;
   if (buttonValue === "Submit" && inputText) {
-    pollingOptions.push({
-      value: inputText ?? "",
-      optionTag: "C",
-      voteCount: 0,
-    });
+    if (pollingOptions.length < 3) {
+      console.log("pollingOptions", pollingOptions.length);
+      pollingOptions.push({
+        value: inputText ?? "",
+        optionTag: "C",
+        voteCount: 1,
+      });
+    }
   } else if (buttonValue == "Submit" && !inputText) {
     return c.res({
       image: (
